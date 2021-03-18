@@ -7,6 +7,7 @@ use Throwable;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Validation\ValidationException;
 
 class Handler extends ExceptionHandler
 {
@@ -50,23 +51,22 @@ class Handler extends ExceptionHandler
      */
     public function render($request, Throwable $exception)
     {
-        // Error Response in JSON for API Routes
+        // Exception Handling for API Routes
         if($request->is('api/*') or $request->expectsJson()) {
             if ($exception instanceof ModelNotFoundException)
             {
                 return response()->json([
                     'message' => 'Sorry, No Record Found'
                 ], Response::HTTP_NOT_FOUND);
-
+            } elseif($exception instanceof ValidationException) {
+                // Do Nothing
             } else {
-
                 return response()->json([
                     'message' => 'Oops, something went wrong',
                 ]);
             }
         }
         
-
         return parent::render($request, $exception);
     }   
 }
